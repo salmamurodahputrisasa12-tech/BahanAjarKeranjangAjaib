@@ -12,6 +12,11 @@
 html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;min-height:100%;font-family:'Fredoka','Trebuchet MS',system-ui,sans-serif;color:var(--ink);background:linear-gradient(180deg,var(--bg1) 0%,var(--bg2) 100%) fixed;font-size:20px;line-height:1.45}
 .ground{position:fixed;left:0;right:0;bottom:0;height:78px;background:linear-gradient(#8ee06e,#3fae45);border-radius:60% 60% 0 0/100% 100% 0 0;z-index:0;font-size:30px;white-space:nowrap;overflow:hidden;line-height:1.2;padding-top:6px;text-align:center}
+.conn{position:relative;display:flex;justify-content:space-between;align-items:stretch;gap:50px;padding:6px 4px;margin:10px 0}.conn .cl,.conn .cr{display:flex;flex-direction:column;justify-content:space-around;gap:10px;z-index:1}.conn svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2}
+.sm{width:112px}.sm .e{font-size:38px!important;animation:none!important}
+.cb{border:0;border-radius:18px;padding:16px 12px;font:700 20px Fredoka,sans-serif;color:#fff;background:var(--c);box-shadow:0 5px 0 #0003;cursor:pointer;min-width:120px}
+.item[data-m="1"]{box-shadow:0 0 0 7px #e8433a,0 7px 0 #0002}
+.item[data-m="2"]::after{content:"❌";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:60px}
 .hore{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%);z-index:30;font-size:clamp(44px,12vw,110px);font-weight:700;line-height:1.1;color:#e8433a;text-shadow:3px 3px 0 #fff,6px 6px 0 #f7b500;pointer-events:none;text-align:center;animation:hz 2.2s ease forwards}
 @keyframes hz{0%{transform:translate(-50%,-50%) scale(.2);opacity:0}20%{transform:translate(-50%,-50%) scale(1.15);opacity:1}80%{opacity:1}100%{transform:translate(-50%,-50%) scale(1);opacity:0}}
 .conf{position:fixed;top:-40px;z-index:25;pointer-events:none;font-size:30px;animation:cf 2.4s linear forwards}
@@ -101,12 +106,12 @@ h3{margin:0 0 6px;font-size:24px}
 </header>
 <main id="app"></main>
 <div class="nav"><button class="btn yel" id="prev">◀ Kembali</button><button class="btn" id="next">Selanjutnya ▶</button></div>
-
+ 
 <script>
 const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
 const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
 const URL_GAME="https://salmamurodahputrisasa12-tech.github.io/KeranjangAjaib/Keranjang%20Ajaib.html";
-
+ 
 /* ---------- Musik latar (nada sederhana dibuat dengan WebAudio) ---------- */
 let ac,musOn=false,timer,step=0;
 const fq=m=>440*2**((m-69)/12);
@@ -140,19 +145,21 @@ function beep(ok){
   if(ok){sparkle();[784,988,1319,1568,2093].forEach((f,i)=>tone(f,t+i*.06,.2,'sine',.09))}
   else{tone(190,t,.13,'square',.08);tone(190,t+.19,.2,'square',.08)}
 }
-
+ 
 /* ---------- Data ---------- */
 const TOPI='<svg viewBox="0 0 64 48" style="width:1em;height:1em;vertical-align:-.12em"><path d="M42 33C52 30 61 32 63 39C57 44 46 43 38 37z" fill="#b3140e" stroke="#6e0d08" stroke-width="2.5" stroke-linejoin="round"/><path d="M7 36C6 17 19 8 32 8s24 9 23 28c0 2-2 3-4 3H11c-2 0-4-1-4-3z" fill="#ee2a20" stroke="#6e0d08" stroke-width="2.5" stroke-linejoin="round"/><path d="M32 8C27 17 26 28 27 39M32 8C39 16 42 28 41 39" stroke="#b3140e" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M7.5 31H54.5" stroke="#b3140e" stroke-width="2"/><circle cx="32" cy="7.5" r="3.2" fill="#b3140e" stroke="#6e0d08" stroke-width="2"/><path d="M13 25C14 18 19 13 25 11" stroke="#fff" stroke-opacity=".6" stroke-width="3" fill="none" stroke-linecap="round"/></svg>';
+const SHAPEV=['<svg viewBox="0 0 100 100" width="92"><circle cx="50" cy="50" r="37" fill="none" stroke="#c9601a" stroke-width="11"/></svg>','<svg viewBox="0 0 100 100" width="92"><polygon points="50,12 90,84 10,84" fill="none" stroke="#1f6fbd" stroke-width="11" stroke-linejoin="round"/></svg>','<svg viewBox="0 0 100 100" width="92"><rect x="14" y="14" width="72" height="72" rx="9" fill="none" stroke="#1f8a3b" stroke-width="11"/></svg>'];
+const SHAPED=['Lengkung memiliki garis tepi yang melengkung.','Segitiga memiliki tiga sisi dan tiga sudut.','Segi empat memiliki empat sisi.'];
 const shapes=[
  {g:'Lengkung',c:'G',items:[['Piring','🍽️'],['Bola','⚽'],['Jam dinding','🕒'],['Melon','🍈']]},
  {g:'Segitiga',c:'Y',items:[['Penggaris segitiga','📐'],['Potongan pizza','🍕']]},
  {g:'Segi empat',c:'R',items:[['Buku','📕'],['Kotak','📦'],['Jendela','🪟'],['Pintu','🚪']]}];
 const colors=[
  {g:'Merah',c:'R',items:[['Apel','🍎'],['Tomat','🍅'],['Topi',TOPI]]},
- {g:'Kuning',c:'Y',items:[['Pisang','🍌'],['Bunga matahari','🌻'],['Kancing','🟡']]},
+ {g:'Kuning',c:'Y',items:[['Pisang','🍌'],['Bunga matahari','🌻'],['Anak ayam','🐥']]},
  {g:'Hijau',c:'G',items:[['Daun','🍃'],['Katak','🐸']]}];
 const sizes=[['Bola','⚽'],['Apel','🍎'],['Bintang','⭐']];
-
+ 
 /* ---------- Soal ---------- */
 const latihan=[
  {p:'🚲',q:'Roda sepeda biasanya memiliki bentuk apa?',o:['Lengkung','Segitiga','Segi empat'],a:0,e:'Roda sepeda bulat, jadi bentuknya lengkung.'},
@@ -173,16 +180,16 @@ const evaluasiLama=[
  {p:'🧺 ❓',q:'Kamu ingin memisahkan apel, tomat, dan topi merah. Kamu memakai dasar ...',o:['Warna','Ukuran','Bentuk'],a:0,e:'Benda-benda itu sama warnanya, yaitu merah.'},
  {p:'🍎',q:'Apel merah yang bulat bisa masuk kelompok merah dan juga kelompok lengkung. Benar?',o:['Benar, satu benda bisa masuk kelompok berbeda','Salah, hanya boleh satu kelompok'],a:0,e:'Benar! Kelompoknya bergantung pada dasar yang dipakai: warna atau bentuk.'},
  {p:'⚽🍽️',q:'Bola dan piring cocok dalam keranjang bentuk ...',o:['Segi empat','Lengkung','Segitiga'],a:1,e:'Bola dan piring sama-sama bulat: lengkung.'}];
-
+ 
 /* ---------- Halaman ---------- */
-const names=['Beranda','Tujuan','Petunjuk','Bentuk','Warna','Ukuran','Cara','Petualangan','Main','Evaluasi','Refleksi','Daftar Isi'];
+const names=['Beranda','Tujuan','Petunjuk','Bentuk','Warna','Ukuran','Cara','Petualangan','Main','Evaluasi','Refleksi','Daftar Isi','LKPD'];
 const guide=(t,av='🧒')=>`<div class="guide"><div class="av">${av}</div><div class="bubble big">${t}</div></div>`;
 const basket=(cls,l,id='')=>`<div class="basket ${cls}" ${id}><div class="body"></div><span class="lab">${l}</span></div>`;
 const item=(n,e,bg,x='')=>`<button class="item bg${bg}" data-n="${n}" ${x}><span class="e">${e}</span><span class="n">${n}</span></button>`;
-
+ 
 const pages=[
 /*1*/()=>`<div class="hero"><span class="spark" style="left:8%;top:30px">✨</span><span class="spark" style="right:10%;top:70px;animation-delay:.6s">⭐</span>
- <div class="av">🧒</div><h1>Keranjang Ajaib</h1><h2>Mengenal Bentuk dan Mengelompokkan Benda</h2>
+ <div style="position:relative;display:inline-block;width:190px;height:175px;animation:bob 2s ease-in-out infinite"><span class="spark" style="left:-8px;top:14px;font-size:46px;animation-delay:.2s">🍎</span><span class="spark" style="left:74px;top:-14px;font-size:44px;animation-delay:.6s">🍌</span><span class="spark" style="right:-8px;top:16px;font-size:46px;animation-delay:1s">🍃</span><svg viewBox="0 0 160 140" style="position:absolute;left:15px;top:36px;width:160px;filter:drop-shadow(0 8px 4px #0004)" aria-label="Maskot keranjang ajaib"><path d="M40 56C40 6 120 6 120 56" stroke="#b8721f" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M22 56H138L124 122C122 130 116 134 108 134H52C44 134 38 130 36 122Z" fill="#f7b500" stroke="#8a5a00" stroke-width="4" stroke-linejoin="round"/><path d="M27 78H133M31 100H129M35 120H125" stroke="#d98e00" stroke-width="3" stroke-linecap="round"/><rect x="16" y="48" width="128" height="16" rx="8" fill="#e8433a" stroke="#8a1f19" stroke-width="4"/><ellipse cx="62" cy="92" rx="7" ry="9" fill="#2b2a4c"/><ellipse cx="98" cy="92" rx="7" ry="9" fill="#2b2a4c"/><circle cx="64" cy="88" r="2.5" fill="#fff"/><circle cx="100" cy="88" r="2.5" fill="#fff"/><circle cx="48" cy="104" r="8" fill="#ff8fa3" opacity=".75"/><circle cx="112" cy="104" r="8" fill="#ff8fa3" opacity=".75"/><path d="M68 104Q80 118 92 104" stroke="#2b2a4c" stroke-width="4" fill="none" stroke-linecap="round"/></svg></div><h1>Keranjang Ajaib</h1><h2>Mengenal Bentuk dan Mengelompokkan Benda</h2>
  <p class="big">Matematika · Kelas 1 SD · Bab 4 Mengenal Bentuk · Subbab B</p>
  <div class="row" style="margin:30px 0">${basket('R','Merah')}${basket('Y','Kuning')}${basket('G','Hijau')}</div>
  <button class="btn" data-go="2" style="font-size:32px">Mulai Belajar</button>
@@ -198,13 +205,13 @@ const pages=[
 /*4*/()=>`<h2>📐 Materi 1: Mengelompokkan Berdasarkan Bentuk</h2>
  <div class="card big center">Benda dengan bentuk yang sama dikelompokkan bersama.</div>
  <div class="msg" id="m1">Klik gambar benda untuk melihat nama dan kelompok bentuknya.</div>
- <div class="row" style="align-items:flex-start">${shapes.map((s,i)=>`<div class="grp ${s.c}" style="background:var(--card)"><h3>${'ABC'[i]}. ${s.g}</h3><div class="row">${s.items.map(([n,e])=>item(n,e,s.c,`data-g="${s.g}"`)).join('')}</div></div>`).join('')}</div>
+ <div class="row" style="align-items:flex-start">${shapes.map((s,i)=>`<div class="grp ${s.c}" style="background:var(--card)"><div class="center">${SHAPEV[i]}</div><h3>${'ABC'[i]}. ${s.g}</h3><p class="big" style="margin:6px 0 0">${SHAPED[i]}</p><div class="row">${s.items.map(([n,e])=>item(n,e,s.c,`data-g="${s.g}"`)).join('')}</div></div>`).join('')}</div>
  <h2>🎯 Tantangan Bentuk</h2><div class="msg" id="f4"></div><div class="row tray" id="fb4"></div>`,
 /*5*/()=>`<h2>🎨 Materi 2: Mengelompokkan Berdasarkan Warna</h2>
  <div class="card big center">Benda dengan warna yang sama dikelompokkan bersama.</div>
  <div class="row" style="align-items:flex-start">${colors.map(c=>`<div class="grp ${c.c}" style="background:var(--card)"><h3>${c.g}</h3><p class="big" style="margin:8px 0 0">${c.items.map(i=>i[1]+' '+i[0]).join(', ')}</p></div>`).join('')}</div>
  <h2>🎯 Tantangan Warna</h2><div class="msg" id="m2"></div><div class="row tray" id="t2"></div>`,
-/*6*/()=>`<h2>📏 Mengelompokkan Berdasarkan Ukuran</h2>
+/*6*/()=>`<h2>📏 Materi 3: Mengelompokkan Berdasarkan Ukuran</h2>
  <div class="card big center">Benda dengan ukuran yang sama dikelompokkan bersama.</div>
  <div class="card"><div class="row">${sizes.map(([n,e])=>`<div class="pair"><span><em style="font-size:96px">${e}</em>Besar</span><span><em style="font-size:36px">${e}</em>Kecil</span></div>`).join('')}</div></div>
  <h2>🎯 Tantangan Ukuran</h2><div class="msg" id="m3"></div><div class="row tray" id="t3" style="align-items:flex-end"></div>`,
@@ -233,9 +240,15 @@ const pages=[
  <div class="msg" id="rmsg">Pilih wajah untuk setiap pernyataan.</div><div class="center" id="rlink"></div>
  <div class="card"><p class="big">Bagian yang paling aku suka:</p><div class="row">${['Materi dan gambar','Tantangan','Petualangan','Keranjang Ajaib'].map(x=>`<button class="opt" data-fav="${x}" style="font-size:20px">${x}</button>`).join('')}</div><div class="msg" id="fmsg">Pilih salah satu.</div></div>
  <div class="card center" style="background:#fff6cf;color:#2b2a4c"><div style="font-size:64px">🙏🌈</div><h2 style="color:#e8433a">Terima kasih!</h2><p class="big">Terima kasih sudah belajar bersama Keranjang Ajaib. Kamu hebat! Sampai jumpa di pelajaran berikutnya! 👋</p><div class="stars">⭐⭐⭐</div></div>`,
-/*12*/()=>`<h2>📑 Daftar Isi</h2><p class="big">Klik salah satu untuk langsung menuju bagiannya.</p><div class="opts">${[[2,'1. Petunjuk Penggunaan','Cara memakai website ini'],[1,'2. Capaian dan Tujuan Pembelajaran','Apa yang akan kamu pelajari'],[3,'3. Materi Bentuk','Lengkung, segitiga, segi empat + tantangan'],[4,'4. Materi Warna','Merah, kuning, hijau + tantangan'],[5,'5. Materi Ukuran','Besar dan kecil + tantangan'],[6,'6. Satu Benda, Beberapa Cara','Apel bisa masuk banyak kelompok'],[7,'7. Petualangan','Game berlari dan mengumpulkan benda'],[8,'8. Keranjang Ajaib','Buka permainan keranjang'],[9,'9. Evaluasi','Soal untuk mengecek belajarmu'],[10,'10. Rangkuman dan Refleksi','Ringkasan dan perasaanmu setelah belajar']].map(([i,t,d])=>`<button class="opt" data-go="${i}" style="font-size:20px">${t}<br><span style="font-weight:500;font-size:16px">${d}</span></button>`).join('')}</div>`
+/*12*/()=>`<h2>📑 Daftar Isi</h2><p class="big">Klik salah satu untuk langsung menuju bagiannya.</p><div class="opts">${[[2,'1. Petunjuk Penggunaan','Cara memakai website ini'],[1,'2. Capaian dan Tujuan Pembelajaran','Apa yang akan kamu pelajari'],[3,'3. Materi Bentuk','Lengkung, segitiga, segi empat + tantangan'],[4,'4. Materi Warna','Merah, kuning, hijau + tantangan'],[5,'5. Materi Ukuran','Besar dan kecil + tantangan'],[6,'6. Satu Benda, Beberapa Cara','Apel bisa masuk banyak kelompok'],[7,'7. Petualangan','Game berlari dan mengumpulkan benda'],[12,'8. LKPD Mandiri','Lembar kerja: hubungkan, lingkari, dan silang'],[8,'9. Keranjang Ajaib','Buka permainan keranjang'],[9,'10. Evaluasi','Soal untuk mengecek belajarmu'],[10,'11. Rangkuman dan Refleksi','Ringkasan dan perasaanmu setelah belajar']].map(([i,t,d])=>`<button class="opt" data-go="${i}" style="font-size:20px">${t}<br><span style="font-weight:500;font-size:16px">${d}</span></button>`).join('')}</div>`,
+/*13*/()=>`<h2>📝 LKPD: Mengelompokkan Benda</h2>
+ <div class="card"><p class="big" style="margin:0">Nama: <input id="lk-name" placeholder="Tulis namamu" style="font:inherit;font-size:22px;padding:6px 12px;border-radius:14px;border:3px solid #c9cbe0;width:min(100%,320px)"></p><p style="margin:8px 0 0">Kerjakan sendiri, ya! Bagian 1 dan 2: ketuk benda, lalu ketuk keranjang untuk menarik garis. Bagian 3: ketuk benda sekali untuk melingkari ⭕, ketuk lagi untuk menyilang ❌, ketuk sekali lagi untuk menghapus.</p></div>
+ <div class="card"><h3>Bagian 1: Bentuk</h3><p>Hubungkan benda dengan keranjang bentuknya.</p><div class="conn" id="lk1"></div><div class="center"><button class="btn yel" data-c="1" style="font-size:20px;padding:10px 26px">Periksa</button></div><div class="msg" id="lm1">Hubungkan semua benda dulu, ya!</div></div>
+ <div class="card"><h3>Bagian 2: Warna</h3><p>Hubungkan benda dengan keranjang warnanya.</p><div class="conn" id="lk2"></div><div class="center"><button class="btn yel" data-c="2" style="font-size:20px;padding:10px 26px">Periksa</button></div><div class="msg" id="lm2">Hubungkan semua benda dulu, ya!</div></div>
+ <div class="card"><h3>Bagian 3: Ukuran</h3><p>Lingkari ⭕ benda yang besar. Silang ❌ benda yang kecil.</p><p class="big" style="background:#fff6cf;color:#2b2a4c;border-radius:18px;padding:10px 14px">👆 Ketuk benda sekali untuk melingkari ⭕, ketuk lagi untuk menyilang ❌.</p><div id="lk3"></div><div class="center"><button class="btn yel" data-c="3" style="font-size:20px;padding:10px 26px">Periksa</button></div><div class="msg" id="lm3">Tandai semua benda dulu, ya!</div></div>
+ <div class="center"><button class="btn red" id="lk-done">Selesai dan Lihat Nilai</button></div><div class="msg" id="lm-all"></div><div id="lk-mail"></div>`
 ];
-
+ 
 /* ---------- Aktivitas ---------- */
 function say(id,t,k){const m=$(id);m.textContent=t;m.className='msg '+(k||'');}
 function finder(box,mid,rounds){let r=0;const B=$(box);
@@ -334,6 +347,53 @@ function initReflect(){
   $$('[data-row]').forEach(row=>$$('.opt',row).forEach(b=>b.onclick=()=>{$$('.opt',row).forEach(x=>x.classList.remove('pick'));b.classList.add('pick');v[row.dataset.row]=+b.dataset.v;beep(1);upd()}));
   $$('[data-fav]').forEach(b=>b.onclick=()=>{$$('[data-fav]').forEach(x=>x.classList.remove('pick'));b.classList.add('pick');beep(1);say('#fmsg',`Wah, kamu suka ${b.dataset.fav}! Terima kasih sudah belajar bersama.`,'ok')});
 }
+function initLKPD(){
+  const d1={items:[['Bola','⚽','Lengkung'],['Pizza','🍕','Segitiga'],['Buku','📕','Segi empat'],['Piring','🍽️','Lengkung'],['Penggaris','📐','Segitiga'],['Pintu','🚪','Segi empat']],baskets:[['Lengkung','G'],['Segitiga','Y'],['Segi empat','R']]};
+  const d2={items:[['Apel','🍎','Merah'],['Pisang','🍌','Kuning'],['Daun','🍃','Hijau'],['Tomat','🍅','Merah'],['Bunga matahari','🌻','Kuning'],['Katak','🐸','Hijau']],baskets:[['Merah','R'],['Kuning','Y'],['Hijau','G']]};
+  function mk(id,d){
+    const box=$(id);
+    box.innerHTML=`<div class="cl">${d.items.map((it,i)=>`<button class="item sm bgW" data-i="${i}"><span class="e">${it[1]}</span><span class="n">${it[0]}</span></button>`).join('')}</div><svg></svg><div class="cr">${d.baskets.map(b=>`<button class="cb ${b[1]}" data-b="${b[0]}">${b[0]}</button>`).join('')}</div>`;
+    const links={},svg=$('svg',box);let sel=null,res=0;
+    box.draw=()=>{const bb=box.getBoundingClientRect();svg.innerHTML=Object.entries(links).map(([i,b])=>{const a=$(`.item[data-i="${i}"]`,box).getBoundingClientRect(),c=$(`.cb[data-b="${b}"]`,box).getBoundingClientRect();const col=res?(d.items[i][2]===b?'#2fa84f':'#e8433a'):'#4a7fe0';return `<line x1="${a.right-bb.left}" y1="${a.top+a.height/2-bb.top}" x2="${c.left-bb.left}" y2="${c.top+c.height/2-bb.top}" stroke="${col}" stroke-width="6" stroke-linecap="round"/>`}).join('')};
+    $$('.item',box).forEach(b=>b.onclick=()=>{$$('.item',box).forEach(x=>x.classList.remove('sel'));b.classList.add('sel');sel=b.dataset.i});
+    $$('.cb',box).forEach(b=>b.onclick=()=>{if(sel===null)return;links[sel]=b.dataset.b;res=0;sel=null;$$('.item',box).forEach(x=>x.classList.remove('sel'));box.draw()});
+    box.check=()=>{if(Object.keys(links).length<d.items.length)return null;res=1;box.draw();return d.items.filter((it,i)=>links[i]===it[2]).length};
+    return box}
+  const b1=mk('#lk1',d1),b2=mk('#lk2',d2);
+  $('#lk3').innerHTML=[['⚽','Bola'],['🍎','Apel'],['⭐','Bintang']].map(([e,n])=>`<div class="row" style="align-items:flex-end;margin:10px 0">${shuffle([[1,96],[0,38]]).map(([big,s])=>`<button class="item bgW" style="position:relative" data-big="${big}" data-m="0"><span class="e" style="font-size:${s}px">${e}</span><span class="n">${n}</span></button>`).join('')}</div>`).join('');
+  $$('#lk3 .item').forEach(b=>b.onclick=()=>{b.dataset.m=(+b.dataset.m+1)%3});
+  const s3=()=>{const t=$$('#lk3 .item');if(t.some(x=>x.dataset.m==='0'))return null;return t.filter(x=>(x.dataset.big==='1'&&x.dataset.m==='1')||(x.dataset.big==='0'&&x.dataset.m==='2')).length};
+  $$('[data-c]').forEach(b=>b.onclick=()=>{const k=b.dataset.c,s=k==='1'?b1.check():k==='2'?b2.check():s3();
+    if(s===null)say('#lm'+k,'Isi semua dulu, ya!');
+    else if(s===6){beep(1);say('#lm'+k,'Hebat! Semua benar! 🎉','ok')}
+    else{beep(0);say('#lm'+k,`Kamu benar ${s} dari 6. Ayo perbaiki yang belum tepat, ya!`,'no')}});
+  $('#lk-done').onclick=()=>{const a=[b1.check(),b2.check(),s3()];
+    if(a.includes(null)){say('#lm-all','Selesaikan semua bagian dulu, ya!');return}
+    const tot=a[0]+a[1]+a[2],nm=$('#lk-name').value.trim();
+    say('#lm-all',`${nm?nm+', ':''}skor LKPD kamu ${tot} dari 18 (Nilai ${Math.round(tot/18*100)}). ${tot>=15?'Luar biasa! Kamu hebat! 🌟':tot>=10?'Bagus! Sedikit lagi kamu hebat! 💪':'Terus semangat! Coba lagi, kamu pasti bisa! 😊'}`,'ok');if(tot>=10)beep(1);
+    mailBox($('#lk-mail'),n2=>({s:`Hasil LKPD Matematika - ${n2}`,b:`Hasil LKPD: Mengelompokkan Benda (Matematika Kelas 1)\nNama: ${n2}\nBagian 1 (Bentuk): ${a[0]} dari 6\nBagian 2 (Warna): ${a[1]} dari 6\nBagian 3 (Ukuran): ${a[2]} dari 6\nSkor: ${tot} dari 18\nNilai: ${Math.round(tot/18*100)}`}),nm)};
+  window.onresize=()=>{if(b1.isConnected){b1.draw();b2.draw()}};
+}
+const GURU_EMAIL='';
+function mailBox(el,getData,name0){
+  const st='font:inherit;font-size:20px;padding:8px 12px;border-radius:14px;border:3px solid #c9cbe0;width:min(100%,360px);margin:4px 0;color:#2b2a4c;background:#fff';
+  el.innerHTML=`<div class="card" style="margin-top:16px"><h3>✉️ Kirim Hasil ke Guru</h3><p>Isi namamu dan email gurumu. Tekan Kirim, lalu aplikasi email akan terbuka. Tekan Kirim di aplikasi email itu.</p><input data-k="nm" placeholder="Nama kamu" style="${st}"><br><input data-k="to" type="email" placeholder="Email guru" style="${st}"><div class="row" style="margin-top:10px"><button class="btn" data-send style="font-size:20px;padding:10px 24px">Kirim ke Email Guru</button><button class="btn yel" data-copy style="font-size:20px;padding:10px 24px">Salin Hasil</button></div><div class="msg" data-mm style="margin-bottom:0"></div></div>`;
+  const g=k=>$(`[data-k="${k}"]`,el),mm=$('[data-mm]',el);
+  let saved='';try{saved=localStorage.getItem('guruEmail')||''}catch(e){}
+  g('to').value=saved||GURU_EMAIL;g('nm').value=name0||'';
+  $('[data-send]',el).onclick=()=>{
+    const to=g('to').value.trim(),nm=g('nm').value.trim();
+    if(!nm){mm.className='msg no';mm.textContent='Tulis namamu dulu, ya.';return}
+    if(!/^\S+@\S+\.\S+$/.test(to)){mm.className='msg no';mm.textContent='Tulis email guru dengan benar, ya.';return}
+    try{localStorage.setItem('guruEmail',to)}catch(e){}
+    const d=getData(nm),url=`mailto:${to}?subject=${encodeURIComponent(d.s)}&body=${encodeURIComponent(d.b)}`;
+    const a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();
+    mm.className='msg ok';mm.innerHTML=`Email siap dikirim! Kalau belum terbuka, <a href="${url}" target="_blank" rel="noopener">klik di sini</a> atau tekan Salin Hasil.`;beep(1)};
+  $('[data-copy]',el).onclick=async()=>{
+    const d=getData(g('nm').value.trim()||'Murid');
+    try{await navigator.clipboard.writeText(d.b);mm.className='msg ok';mm.textContent='Hasil sudah disalin. Tempel di pesan ke gurumu.'}
+    catch(e){mm.className='msg no';mm.textContent='Hasil belum bisa disalin otomatis. Coba tombol Kirim ke Email Guru.'}};
+}
 function sorter(tray,bs,msgId,items,baskets,okTxt,noTxt){
   let sel=null;const T=$(tray),B=$(bs);
   T.innerHTML=shuffle(items).map((it,i)=>`<button class="item bg${it.bg}" data-i="${i}" data-grp="${it.grp}" data-n="${it.n}" data-e="${it.e}"><span class="e" style="font-size:${it.s||64}px">${it.e}</span><span class="n">${it.n}</span></button>`).join('');
@@ -361,14 +421,15 @@ function initHow(){
   $$('[data-how]').forEach(b=>b.onclick=()=>{beep(1);say('#m7',t[b.dataset.how],'ok')});
 }
 function quiz(el,qs,doneKey){
-  const E=$(el);let i=0,score=0,pick=null,checked=false,res=[];
+  const E=$(el);let i=0,score=0,pick=null,checked=false,res=[],ans=[];
   const draw=()=>{
     if(i>=qs.length){const pct=score/qs.length;
       E.innerHTML=`<div class="card center"><div class="stars">${'⭐'.repeat(Math.max(1,Math.round(pct*3)))}</div><h2>Skor kamu: ${score} dari ${qs.length} (Nilai ${Math.round(score/qs.length*100)})</h2>
       <p class="big">${pct>=.8?'Luar biasa! Kamu pintar sekali!':pct>=.5?'Bagus! Sedikit lagi kamu hebat!':'Terus semangat! Ayo coba lagi, kamu pasti bisa!'}</p>
       <div style="text-align:left">${res.map((r,k)=>`<p>${r?'✅':'🟡'} Soal ${k+1}: ${qs[k].e}</p>`).join('')}</div>
-      <button class="btn red" id="again">Coba Lagi</button></div>`;
-      $('#again').onclick=()=>{i=0;score=0;res=[];pick=null;checked=false;draw()};return}
+      <button class="btn red" id="again">Coba Lagi</button><div id="ev-mail"></div></div>`;
+      $('#again').onclick=()=>{i=0;score=0;res=[];ans=[];pick=null;checked=false;draw()};
+      mailBox($('#ev-mail'),nm=>({s:`Hasil Evaluasi Matematika - ${nm}`,b:`Hasil Evaluasi: Mengelompokkan Benda (Matematika Kelas 1)\nNama: ${nm}\nSkor: ${score} dari ${qs.length}\nNilai: ${Math.round(score/qs.length*100)}\n\nRincian:\n`+qs.map((q,k)=>`Soal ${k+1}: ${res[k]?'Benar':'Salah'} (jawaban murid: ${q.o[ans[k]]})`).join('\n')}));return}
     const q=qs[i];
     E.innerHTML=`<p class="big">Soal ${i+1} dari ${qs.length}</p><div class="prog"><i style="width:${i/qs.length*100}%"></i></div>
     <div class="card"><div class="qpic">${q.p}</div><p class="big center">${q.q}</p>
@@ -380,17 +441,17 @@ function quiz(el,qs,doneKey){
     $('#chk').onclick=()=>{
       if(checked){i++;draw();return}
       if(pick===null){say('#qm','Pilih jawabanmu dulu, ya!');return}
-      checked=true;const ok=pick===q.a;if(ok)score++;res.push(ok);beep(ok);
+      checked=true;const ok=pick===q.a;if(ok)score++;res.push(ok);ans.push(pick);beep(ok);
       $$('.opt',E).forEach((b,k)=>{b.classList.remove('pick');if(k===q.a)b.classList.add('right');else if(k===pick)b.classList.add('bad')});
       say('#qm',(ok?'Benar! Hebat! ':'Belum tepat, tidak apa-apa. ')+q.e,ok?'ok':'no');
       $('#chk').textContent=i===qs.length-1?'Lihat Skor':'Soal Berikutnya';
     };
   };draw();
 }
-
+ 
 /* ---------- Navigasi ---------- */
 let cur=0;const seen=new Set();
-const dots=$('#dots');const order=[0,2,11,1,3,4,5,6,7,8,9,10];
+const dots=$('#dots');const order=[0,2,11,1,3,4,5,6,7,12,8,9,10];
 dots.innerHTML=order.map((id,i)=>`<button data-p="${i}" aria-label="${names[id]}">${i+1}</button>`).join('');
 function show(n){
   cur=Math.max(0,Math.min(pages.length-1,n));seen.add(cur);
@@ -399,7 +460,7 @@ function show(n){
   $('#prev').style.visibility=cur?'visible':'hidden';
   $('#next').style.visibility=cur<pages.length-1?'visible':'hidden';
   const id=order[cur];if(id===3)initShapes();if(id===4)initColor();if(id===5)initSize();if(id===6)initHow();
-  if(id===7)initGame();if(id===10)initReflect();if(id===9)quiz('#quiz2',evaluasi);
+  if(id===7)initGame();if(id===12)initLKPD();if(id===10)initReflect();if(id===9)quiz('#quiz2',evaluasi);
   $$('[data-go]').forEach(b=>b.onclick=()=>show(order.indexOf(+b.dataset.go)));
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -409,3 +470,4 @@ show(0);
 </script>
 </body>
 </html>
+ 
